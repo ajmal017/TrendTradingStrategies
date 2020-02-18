@@ -29,7 +29,7 @@ def log_get_returns(prices):
 
 
 
-### Simple Linear Regression Predictor (within 1 standard deviation)
+### Simple Linear Regression Predictor (within 1/n * standard deviations, where n is selected by the user)
 def lin_reg_predictor(prices,n): #prices array-like, n > 0
 
     x = np.linspace(0.0,float(len(prices) - 1), len(prices))
@@ -47,7 +47,7 @@ def lin_reg_predictor(prices,n): #prices array-like, n > 0
 
 ### ADX INDICATOR
 
-####components of adx in function formatt
+####components of adx
 #####Directional Movement List Generator
 def DM(listprice):
     DM_list = []
@@ -82,6 +82,8 @@ def SmoothAverage(list_len_14): #list length is strictly 14 in this function
     smoothAverage = (13*heavyterm + lightterm)/14
     return smoothAverage#returns scalar
 """
+#suspicion is that exponential moving average is more accurate predictor using ADX than smooth moving average. Subject to modification.
+
 
 ######Exponential Moving Average  
 def ExponentialMovingAverage(list):#if applied to ADX, should have the same length the total interval of analysis; gives a specific number
@@ -154,6 +156,7 @@ def CurrentADX(final,list1,list2,period,numLargePeriods):
   i = initial + 14*period - 1
   ADX_i = DX // 14.0
   
+  #the code below is a faulty implementation of adx calculator--to be modified later
   while i < final - 1:
     j = i
     DX = 0
