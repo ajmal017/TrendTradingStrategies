@@ -156,13 +156,13 @@ def CurrentADX(final,list1,list2,period,NumLargePeriod):
       currentADX = np.average(DX_vector)
       ADX_vector.append(currentADX)
       k += 1
-    elif i > initial + period*14:#doublecheck for indexing
+    elif (i > initial + period*14) and (i%period == 0):#doublecheck for indexing
       prevADX = ADX_vector[int(k) - 1]
       currentADX = DX_i*(2//(N + 1)) + prevADX(1 - (2//(N + 1))) #N = NumLargePeriods813 could possibly be wrong, but this is a relatively easy fix; more problematic would be if this formula is incorrectly implemented
       ADX_vector.append(currentADX)
       k += 1
       
     #changing index by three
-    i += count
+    i += count + 1
 
   return ADX_vector
