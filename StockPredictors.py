@@ -166,4 +166,4 @@ def CurrentADX(final,list1,list2,period,NumLargePeriod):
     i += count + 1
 
   return ADX_vector
-  #still in progress
+  #still in progress 1
