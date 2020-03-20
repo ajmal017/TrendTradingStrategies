@@ -1,5 +1,3 @@
-#Indicators Applied
-
 ###Imports
 import numpy as np
 #from scipy import stats
@@ -22,7 +20,7 @@ def criteria(textfile):
     vortexrisk = float(mylist[4])
     text_file.close()#don't leave your files open--bad feng shue
     
-    return startdate,enddate,adxthreshold,vortexthreshold,vortexrisk
+    return startdate,enddate,adxthreshold,vortexthreshold,vortexrisk#names explain themselves
 
 ##GETTING DATA as CSV
 def CSVconverter(filename):
@@ -150,8 +148,8 @@ def StockFinder(stocks,searchcriteria):#both file names, 'stocklist.csv' and 'se
     vortex = []
     averagesuccess = []
     averagereturn = []
-    adx_applicability = []
-    vortex_applicability = []
+    #adx_applicability = []
+    #vortex_applicability = []
     stocklist1 = []
     stocktype = []
     
@@ -161,6 +159,7 @@ def StockFinder(stocks,searchcriteria):#both file names, 'stocklist.csv' and 'se
         currentprice_i,adx_i,vortex_i,averagesuccess_i,averagereturn_i = ADXVortexPredictionRate(stockname,startdate,enddate,adxthreshhold,vortexrisk)
         
         #adx/vortex applicability
+        """
         if adx_i >= adxthreshhold:
             adx_applicable = 'true'
         else:
@@ -172,7 +171,7 @@ def StockFinder(stocks,searchcriteria):#both file names, 'stocklist.csv' and 'se
             
         adx_applicability.append(adx_applicable)
         vortex_applicability.append(vortex_applicable)
-        
+        """
         
         #decision factor stats
         currentprice.append(currentprice_i)
@@ -192,18 +191,21 @@ def StockFinder(stocks,searchcriteria):#both file names, 'stocklist.csv' and 'se
                   'current adx':adx,
                   'current vortex':vortex,
                   'average success':averagesuccess,
-                  'average return':averagereturn,
-                  'adx meets threshold':adx_applicability,
-                  'vortex meets threshold':vortex_applicability}
+                  'average return':averagereturn}#,
+                  #'adx meets threshold':adx_applicability,
+                  #'vortex meets threshold':vortex_applicability}
     
     df = pd.DataFrame (dictionary, 
-                       columns = ['name','sector','current price','current adx','current vortex','average success','average return','adx meets threshhold','vortex meets threshhold'])
+                       columns = ['name','sector','current price','current adx','current vortex','average success','average return'])#,'adx meets threshhold','vortex meets threshhold'])
     return df
 
+def PresentAnalysis(stocks,criteria,outfile):
+    df = StockFinder(stocks,criteria)
+    df.to_csv(outfile,header=True,index=False)
 
 
 
-#test command (no longer necessary)
+#test commands
     
 """
 stockrolidex = 'CommonStocks.csv'
@@ -213,6 +215,71 @@ outfile = 'AnalysisResults.csv'
 relevant commands
 
 df[df['vortex meets threshold'] == 'true']
+
+
+
+##other possibilities . . .
+
+def strategysuccess(n,stock,vortexrisk):
+    
+    PosVort = []
+    for i in range(0,len(stock['vortex'])):
+        a = stock['vortex'][i]
+        if a > 0:
+            PosVort.append(a)
+
+    avgposvortex = np.average(PosVort)
+    
+
+    sumx = 0
+    sumincrease = 0
+    gains = 0
+    for i in range(0,len(stock) - n):
+        
+        #including all possibilities (Baysian probability)
+        current_vortex = stock['vortex'][i]
+        current_price = stock['Open'][i]
+        
+        increased_prices = []
+        decreased_prices = []
+        #catching increases
+        for j in range(0,n):
+            
+            if (stock['Open'][i + j] >= current_price) or (stock['Close'][i + j] >= current_price) or (stock['High'][i + j] >= current_price) or (stock['Low'][i + j] >= current_price):
+                success = bool(1)
+                increased_prices.append(stock['Open'][i + j])
+            else:
+                success = bool(0)
+                decreased_prices.append(stock['Open'][i + j])
+        
+                             
+            
+
+
+        if (current_vortex > 0) and (abs(current_vortex - avgposvortex) <= vortexrisk*abs(avgposvortex - vortex)):#
+            sumx += 1
+            #gains += (next_price - current_price)#need to fix this
+            
+            #error checks
+            #print('current vortex:',current_vortex,'\n','average-positive-vortex: ',avgposvortex,'\n','gains: ',gains,'\n')
+            #print('next price: ',next_price,'\ncurrent price: ',current_price,'\n\n')
+            
+            
+            
+
+            if success:
+                gains += np.min(increased_prices)
+                sumincrease += 1
+            else:
+                gains += np.min(decreased_prices)
+
+    if sumx == 0:
+        sumincrease = 0
+        sumx = 1
+
+    averagesuccess = sumincrease / sumx
+    averagereturn = gains / sumx
+    return averagesuccess,averagereturn
 
 """
 
